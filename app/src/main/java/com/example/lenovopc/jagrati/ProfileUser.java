@@ -18,6 +18,7 @@ import java.util.Map;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
@@ -39,8 +40,10 @@ public class ProfileUser extends BaseActivity {
             getUserProfile(_userId);
 
             final ImageButton optionBtn = (ImageButton) findViewById(R.id.options);
+            Button logoutBtn = (Button) findViewById(R.id.logout);
             if (userId != _userId) {
                 optionBtn.setVisibility(View.GONE);
+                logoutBtn.setVisibility(View.GONE);
             } else {
                 optionBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -141,6 +144,7 @@ public class ProfileUser extends BaseActivity {
         if (!displayPictureURL.equals("null")) {
             NetworkImageView dpIView = (NetworkImageView) findViewById(R.id.displayPicture);
             dpIView.setImageUrl(displayPictureURL, imageLoader);
+            dpIView.setBackground(null);
         }
 
         TextView nameView = (TextView) findViewById(R.id.name);
