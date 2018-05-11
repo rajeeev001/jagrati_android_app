@@ -2,6 +2,7 @@ package com.example.lenovopc.jagrati;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
@@ -47,6 +48,19 @@ public class TeachingDepartment extends BaseActivity {
             @Override
             public void onClick(View view) {
                 onPopupButtonClick(optionBtn);
+            }
+        });
+
+        Button addSubjectBtn = (Button) findViewById(R.id.addSubject);
+        addSubjectBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent addSubjectActivity = new Intent(TeachingDepartment.this, AddSubject.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("header", "Add Subject");
+                bundle.putString("urlSlug", "/subjects/");
+                addSubjectActivity.putExtras(bundle);
+                startActivityForResult(addSubjectActivity, 100);
             }
         });
     }
@@ -103,31 +117,51 @@ public class TeachingDepartment extends BaseActivity {
                 GridLayout gridLayout = (GridLayout) findViewById(R.id.gridWrap);
                 View subjectButtonView = getLayoutInflater().inflate(R.layout.subject_button, null);
 
-                Button subjectNameBtn = (Button) subjectButtonView.findViewById(R.id.buttonTitle);
-                subjectNameBtn.setText(name);
-                subjectNameBtn.setOnClickListener( new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Class cls = SubjectTeachingDepartment.class;
-                        if (forAttendance) {
-                            cls = VolunteerAttendance.class;
-                        }
-                        Intent subjectDeptActivity = new Intent(TeachingDepartment.this, cls);
-                        Bundle bundle = new Bundle();
-                        bundle.putString("subjectId", id);
-                        bundle.putString("subjectName", name);
-                        subjectDeptActivity.putExtras(bundle);
-                        startActivity(subjectDeptActivity);
-                    }
-                });
-
-                TextView numTeachersTextView = (TextView) subjectButtonView.findViewById(R.id.buttonCaption);
-                numTeachersTextView.setText(numVolunteersLabel);
-
-                gridLayout.addView(subjectButtonView);
+                initializeSubject(gridLayout, subjectButtonView, id, name, numVolunteersLabel);
             } catch (JSONException e) {
-                // TODO: Show error here.
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
             }
+        }
+    }
+
+    private void initializeSubject(GridLayout gridLayout, View subjectButtonView, final String id,
+                                   final String name, final String numVolunteersLabel) {
+        Button subjectNameBtn = (Button) subjectButtonView.findViewById(R.id.buttonTitle);
+        subjectNameBtn.setText(name);
+        subjectNameBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Class cls = SubjectTeachingDepartment.class;
+                if (forAttendance) {
+                    cls = VolunteerAttendance.class;
+                }
+                Intent subjectDeptActivity = new Intent(TeachingDepartment.this, cls);
+                Bundle bundle = new Bundle();
+                bundle.putString("subjectId", id);
+                bundle.putString("subjectName", name);
+                subjectDeptActivity.putExtras(bundle);
+                startActivity(subjectDeptActivity);
+            }
+        });
+
+        TextView numTeachersTextView = (TextView) subjectButtonView.findViewById(R.id.buttonCaption);
+        numTeachersTextView.setText(numVolunteersLabel);
+
+        gridLayout.addView(subjectButtonView);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
+            String name = data.getExtras().getString("name");
+            String id = data.getExtras().getString("id");
+            String numVolunteersLabel = "0 Teachers";
+
+            GridLayout gridLayout = (GridLayout) findViewById(R.id.gridWrap);
+            View subjectButtonView = getLayoutInflater().inflate(R.layout.subject_button, null);
+
+            initializeSubject(gridLayout, subjectButtonView, id, name, numVolunteersLabel);
         }
     }
 }
